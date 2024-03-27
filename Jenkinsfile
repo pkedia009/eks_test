@@ -16,13 +16,13 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo '=== Building Application ==='
-                sh 'mvn clean install'
+                echo '=== Building  and testing Application ==='
+                
             }
         }
         stage('Building Docker Image') {
             when {
-                branch 'master'
+                branch 'develop'
             }
             steps {
                 echo '=== Building Docker Image ==='

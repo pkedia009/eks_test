@@ -53,5 +53,27 @@ pipeline {
                 }
             }
         }
+        
+        stage('Helm Install or Upgrade') {
+            steps {
+                echo '=== Helm Install or Upgrade ==='
+                script {
+                    // Install or upgrade the Helm chart here
+                    def releaseName = "my-helm-release"
+                    def chartName = "my-helm-chart"
+                    def namespace = "data-pg" // Namespace set to data-pg
+                    def valuesFile = "path/to/your/values.yaml"
+                    
+                    // Check if the release already exists
+                    def releaseExists = sh(script: "helm list -q $releaseName", returnStatus: true) == 0
+                    
+                    if (releaseExists) {
+                        sh "helm upgrade $releaseName $chartName -f $valuesFile -n $namespace"
+                    } else {
+                        sh "helm install $releaseName $chartName -f $valuesFile -n $namespace"
+                    }
+                }
+            }
+        }
     }
 }

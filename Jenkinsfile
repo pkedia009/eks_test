@@ -3,11 +3,16 @@ pipeline {
     triggers {
         pollSCM "* * * * *"
     }
-    environment {
-        registry = "account_id.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo"
-        ecrRegistryUrl = 'https://account_id.dkr.ecr.us-east-1.amazonaws.com'
-        ecrCredentials = 'ECR_Credentials'
-    }
+    #environment {
+    #    registry = "account_id.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo"
+    #    ecrRegistryUrl = 'https://account_id.dkr.ecr.us-east-1.amazonaws.com'
+    #    ecrCredentials = 'ECR_Credentials'
+    #}
+  environment {
+      registryCredential = 'ecr:us-east-1:aws creds'
+      appRegistry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test" 
+      myprojectRegistry = "https:533267099239.dkr.ecr.us-east-1.amazonaws.com/"
+}
     stages {
         stage('Cloning Git') {
             steps {
@@ -27,9 +32,10 @@ pipeline {
             steps {
                 echo '=== Building Docker Image ==='
                 script {
-                    dockerImage = docker.build registry
-                    dockerImage.tag("$BUILD_NUMBER")
-                    dockerImage.push()
+                    #dockerImage = docker.build registry
+                    #dockerImage.tag("$BUILD_NUMBER")
+                    #dockerImage.push()
+                    docker Image = docker.build( appRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage/")
                 }
             }
         }

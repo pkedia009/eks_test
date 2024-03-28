@@ -4,7 +4,7 @@ pipeline {
         pollSCM "* * * * *"
     }
     environment {
-        registryCredential = 'ecr:us-east-1:aws creds'
+        registryCredential = 'ecr:us-east-1:aws_cred'
         appRegistry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks" 
         myprojectRegistry = "https//:533267099239.dkr.ecr.us-east-1.amazonaws.com/"
     }

@@ -21,9 +21,7 @@ pipeline {
             }
         }
         stage('Building Docker Image') {
-            when {
-                branch 'develop'
-            }
+          
             steps {
                 echo '=== Building Docker Image ==='
                 script {
@@ -32,9 +30,7 @@ pipeline {
             }
         }
         stage('Pushing to ECR') {
-            when {
-                branch 'master'
-            }
+          
             steps {
                 echo '=== Pushing Docker Image to ECR ==='
                 script {

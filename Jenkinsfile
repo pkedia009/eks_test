@@ -40,15 +40,10 @@ pipeline {
                         dockerImage.push("$BUILD_NUMBER")
                         dockerImage.push('latest')
                     }
+                     echo '=== error while pushing ==='
                 }
             }
         }
-        stage('Helm Deploy') {
-            steps {
-                script {
-                    sh "helm upgrade first --install mychart --namespace helm-deployment --set image.tag=$BUILD_NUMBER"
-                }
-            }
-        }
+        
     }
 }

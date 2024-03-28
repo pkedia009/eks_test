@@ -1,11 +1,14 @@
-# Use the official NGINX base image
-FROM nginx:latest
+# Use the official Python base image with Python 3
+FROM python:3
 
-# Copy custom configuration file to NGINX config directory
-COPY nginx.conf /etc/nginx/nginx.conf
+# Set a working directory inside the container
+WORKDIR /app
 
-# Copy static files (HTML, CSS, JS, etc.) to NGINX web root directory
-COPY ./static-files /usr/share/nginx/html
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Expose port 80 to allow external access
-EXPOSE 80
+# Install any needed dependencies specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]

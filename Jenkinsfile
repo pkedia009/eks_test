@@ -25,7 +25,7 @@ pipeline {
             steps {
                 echo '=== Building Docker Image ==='
                 script {
-                    dockerImage = docker.build("${appRegistry}:${BUILD_NUMBER}", "./Dockerfile")
+                    dockerImage = docker.build("${appRegistry}:${BUILD_NUMBER}", "/var/lib/jenkins/workspace/eks/Dockerfile")
                 }
             }
         }

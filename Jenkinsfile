@@ -6,7 +6,7 @@ pipeline {
     environment {
         registryCredential = 'ecr:us-east-1:aws creds'
         appRegistry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test" 
-        myprojectRegistry = "https:533267099239.dkr.ecr.us-east-1.amazonaws.com/"
+        myprojectRegistry = "https//:533267099239.dkr.ecr.us-east-1.amazonaws.com/"
     }
     stages {
         stage('Cloning Git') {

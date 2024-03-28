@@ -49,13 +49,16 @@ pipeline {
                     GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true).trim()
                     SHORT_COMMIT = GIT_COMMIT_HASH.take(7)
 
-                    docker.withRegistry(ecrRegistryUrl, ecrCredentials) {
-                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ecrRegistryUrl"
-                        app = docker.image(registry)
-                        app.push("$BUILD_NUMBER")
-                        app.push("$SHORT_COMMIT")
-                        app.push("latest")
-                    }
+                    #docker.withRegistry(ecrRegistryUrl, ecrCredentials) {
+                    #    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ecrRegistryUrl"
+                    #    app = docker.image(registry)
+                    #    app.push("$BUILD_NUMBER")
+                    #    app.push("$SHORT_COMMIT")
+                    #    app.push("latest")
+                    #}
+                  docker.withRegistry (myprojectRegistry,registryCredential) {
+                  dockerImage.push("$BUILD_NUMBER")
+                  dockerImage.push('latest')
                 }
             }
         }

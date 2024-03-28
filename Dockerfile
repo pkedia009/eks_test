@@ -1,14 +1,14 @@
-# Use the official Python base image with Python 3
-FROM python:3
+# Use BusyBox as the base image
+FROM busybox
 
-# Set a working directory inside the container
+# Create a directory to hold application files
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy your application files into the container
+COPY . .
 
-# Install any needed dependencies specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Set up any additional configurations or commands
+# For example, you might configure environment variables or set up a command to run when the container starts.
 
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+# Define the command to run when the container starts (optional)
+CMD ["sh"]

@@ -5,16 +5,16 @@ pipeline {
      triggers {
         pollSCM "* * * * *"
        }
-       def ecrRegistryUrl = 'https://account_id.dkr.ecr.us-east-1.amazonaws.com'
+       def ecrRegistryUrl = 'https://533267099239.dkr.ecr.us-east-1.amazonaws.com'
        def ecrCredentials = 'ECR_Credentials'
     environment {
-        registry = "account_id.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo"
+        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks"
     }
    
     stages {
         stage('Cloning Git') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/akannan1087/docker-spring-boot']]])     
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: '']]])     
             }
         }
       stage ('Build') {

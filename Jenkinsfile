@@ -2,7 +2,6 @@ pipeline {
     agent any
     
     environment {
-   
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
         // Define the AWS ECR repository URL
@@ -18,10 +17,9 @@ pipeline {
         
         stage('Building Docker image') {
             steps {
-                
                 script {
                     // Build the Docker image using the specified Dockerfile path
-                    def dockerImage = docker.build("-f ${DOCKERFILE_PATH} .")
+                    def dockerImage = docker.build("-f ${DOCKERFILE_PATH}/Dockerfile .")
                     // Tag the Docker image with the build number
                     dockerImage.tag("${BUILD_NUMBER}")
                 }
@@ -44,7 +42,7 @@ pipeline {
                     
                     // Push the Docker image to AWS ECR
                     docker.withRegistry("${AWS_ECR_REPO_URL}", 'ecr:us-east-1') {
-                           dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
+                        dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
                     }
                 }
             }

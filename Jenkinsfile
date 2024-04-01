@@ -21,11 +21,16 @@ pipeline {
          stage('Logging into AWS ECR') {
             steps {
                 script {
-                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+                     // Get the AWS credentials from Jenkins credentials
+                    withCredentials([aws(credentials: 'aws_cred', region: 'us-east-1')]) {
+                        // Use the AWS CLI to retrieve an authentication token to use for Docker login
+                        def ecrLoginCmd = "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                        sh ecrLoginCmd
                 }
                  
             }
         }
+        
 
         stage('Building image') {
       steps{

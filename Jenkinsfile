@@ -2,16 +2,46 @@ pipeline {
     agent any
     
     environment {
-        AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()
-        AWS_DEFAULT_REGION = sh(script: 'aws configure get region', returnStdout: true).trim()
+        // Get AWS account ID
+        AWS_ACCOUNT_ID = ''
+        // Use withCredentials to securely get AWS default region
+        AWS_DEFAULT_REGION = ''
+       
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
         IMAGE_REPO_NAME = "test_eks"
         IMAGE_TAG = "v1"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
+ 
+    
+
+        
+      
     
     stages {
+        stage('Set AWS Credentials') {
+            steps {
+                script {
+                    // Use withCredentials to securely retrieve AWS account ID
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                        AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()
+                    }
+                }
+            }
+        }
+
+          stage('Set AWS Default Region') {
+            steps {
+                script {
+                    // Use withCredentials to securely retrieve AWS default region
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                        AWS_DEFAULT_REGION = sh(script: 'aws configure get region', returnStdout: true).trim()
+                    }
+                }
+            }
+        }
+       
         stage('Create ECR Repository') {
             steps {
                 script {

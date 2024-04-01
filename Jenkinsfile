@@ -2,12 +2,12 @@ pipeline {
     agent any
    
     environment {
-        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks1"
+        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks"
     }
     stages {
         stage('Cloning Git') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/pkedia009/eks_test.git']]])     
+                checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/pkedia009/eks_test.git']]])     
             }
         }
         stage ('Build') {

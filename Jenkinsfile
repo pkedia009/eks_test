@@ -1,8 +1,6 @@
 pipeline {
     agent any
-    triggers {
-        pollSCM "* * * * *"
-    }
+   
     environment {
         registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks"
     }

@@ -29,7 +29,7 @@ pipeline {
         }
         stage('Pushing to ECR') {
             when {
-                branch 'master'
+                branch 'develop'
             }
             steps {
                 echo '=== Pushing Docker Image ==='
@@ -38,10 +38,10 @@ pipeline {
                     SHORT_COMMIT = GIT_COMMIT_HASH.take(7)
                     
                     docker.withRegistry("${AWS_ECR_REPO_URL}", ecrCredentials) {
-                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ecrRegistryUrl"
-                         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
+                        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ECR_REPO_URL"
+                         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
                         // Push the Docker image to AWS ECR
-                   'ecr:us-east-1') 
+                
                             dockerImage.push("${BUILD_NUMBER}")
                         
                     

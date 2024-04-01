@@ -36,17 +36,16 @@ pipeline {
                     // Get the Git commit hash
                     def GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true).trim()
                     def SHORT_COMMIT = GIT_COMMIT_HASH.take(7)
-                    
-                    // Log in to AWS ECR
-                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ECR_REPO_URL"
-                    
-                    // Push the Docker image to AWS ECR
-                    docker.withRegistry("${AWS_ECR_REPO_URL}", 'ecr:us-east-1') {
-                        dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
-                    }
+                    withCredentials([aws(credentials: 'aws_credentials_id', region: 'us-east-1')]) {
+                sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ECR_REPO_URL"
+                
+                // Push the Docker image to AWS ECR
+                docker.withRegistry("${AWS_ECR_REPO_URL}", 'ecr:us-east-1') {
+                    dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
+                }
                 }
             }
-        }
+        }}
         
         stage ('Helm Deploy') {
             steps {

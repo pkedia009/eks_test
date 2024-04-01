@@ -5,6 +5,8 @@ pipeline {
         registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test"
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
+        // Define the AWS ECR repository URL
+        AWS_ECR_REPO_URL = 'your-aws-ecr-repo-url'
     }
     stages {
         stage('Cloning Git') {
@@ -35,12 +37,14 @@ pipeline {
                     GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true).trim()
                     SHORT_COMMIT = GIT_COMMIT_HASH.take(7)
                     
-                    docker.withRegistry(ecrRegistryUrl, ecrCredentials) {
+                    docker.withRegistry("${AWS_ECR_REPO_URL}", ecrCredentials) {
                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ecrRegistryUrl"
-                        app.push("$BUILD_NUMBER")
-                        app.push("$SHORT_COMMIT")
-                        app.push("latest")
-                    }
+                         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
+                        // Push the Docker image to AWS ECR
+                   'ecr:us-east-1') 
+                            dockerImage.push("${BUILD_NUMBER}")
+                        
+                    
                 }
             }
         }

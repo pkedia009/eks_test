@@ -2,10 +2,9 @@ pipeline {
     agent any
     
     environment {
-        // Get AWS account ID
-        AWS_ACCOUNT_ID = ''
-        // Use withCredentials to securely get AWS default region
-        AWS_DEFAULT_REGION = ''
+          // Define AWS credentials and region
+        def AWS_ACCOUNT_ID = ''
+        def AWS_DEFAULT_REGION = ''
        
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
@@ -20,27 +19,38 @@ pipeline {
       
     
     stages {
+        
+
+          def setAWSCredentials = {
+            // Use withCredentials to securely retrieve AWS account ID
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()
+            }
+        }
+
+        def setAWSDefaultRegion = {
+            // Use withCredentials to securely retrieve AWS default region
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                AWS_DEFAULT_REGION = sh(script: 'aws configure get region', returnStdout: true).trim()
+            }
+        }
+
         stage('Set AWS Credentials') {
             steps {
                 script {
-                    // Use withCredentials to securely retrieve AWS account ID
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
-                        AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()
-                    }
+                    setAWSCredentials()
                 }
             }
         }
 
-          stage('Set AWS Default Region') {
+        stage('Set AWS Default Region') {
             steps {
                 script {
-                    // Use withCredentials to securely retrieve AWS default region
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
-                        AWS_DEFAULT_REGION = sh(script: 'aws configure get region', returnStdout: true).trim()
-                    }
+                    setAWSDefaultRegion()
                 }
             }
         }
+        
        
         stage('Create ECR Repository') {
             steps {

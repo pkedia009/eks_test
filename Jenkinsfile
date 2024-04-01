@@ -22,10 +22,11 @@ pipeline {
             steps {
                 script {
                      // Get the AWS credentials from Jenkins credentials
-                    withCredentials([aws(credentials: 'aws_cred', region: 'us-east-1')]) {
-                        // Use the AWS CLI to retrieve an authentication token to use for Docker login
-                        def ecrLoginCmd = "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-                        sh ecrLoginCmd
+                    // Get the AWS credentials from Jenkins credentials
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                // Use the AWS CLI to retrieve an authentication token to use for Docker login
+                def ecrLoginCmd = "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                sh ecrLoginCmd
                     }
                 }
             }

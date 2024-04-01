@@ -2,11 +2,11 @@ pipeline {
     agent any
     
     environment {
-        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test"
+   
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
         // Define the AWS ECR repository URL
-        AWS_ECR_REPO_URL = 'your-aws-ecr-repo-url'
+        AWS_ECR_REPO_URL = '533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks'
     }
     
     stages {
@@ -44,7 +44,7 @@ pipeline {
                     
                     // Push the Docker image to AWS ECR
                     docker.withRegistry("${AWS_ECR_REPO_URL}", 'ecr:us-east-1') {
-                        dockerImage.push("${BUILD_NUMBER}")
+                           dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
                     }
                 }
             }

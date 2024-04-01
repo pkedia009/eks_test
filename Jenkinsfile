@@ -2,7 +2,7 @@ pipeline {
     agent any
    
     environment {
-        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks"
+        registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test"
     }
     stages {
         stage('Cloning Git') {

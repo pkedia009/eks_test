@@ -3,6 +3,8 @@ pipeline {
    
     environment {
         registry = "533267099239.dkr.ecr.us-east-1.amazonaws.com/eks_test"
+        // Define the path to your Dockerfile
+        DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
     }
     stages {
         stage('Cloning Git') {
@@ -10,20 +12,16 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/pkedia009/eks_test.git']]])     
             }
         }
-        stage ('Build') {
-            steps {
-                echo '=== Building Application ==='
-                      
-            }
-        }
+      
         stage('Building Docker image') {
            
             steps {
                 echo '=== Building Docker Image ==='
                 script {
-                    dockerImage = docker.build registry 
-                    dockerImage.tag("$BUILD_NUMBER")
-                    app = docker.build("ibuchh/petclinic-spinnaker-jenkins")
+                      // Build the Docker image using the specified Dockerfile path
+                    dockerImage = docker.build("-f ${DOCKERFILE_PATH} .")
+                    // Tag the Docker image with the build number
+                    dockerImage.tag("${BUILD_NUMBER}")
                 }
             }
         }

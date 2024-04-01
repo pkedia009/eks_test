@@ -2,16 +2,24 @@ pipeline {
     agent any
     
     environment {
-        AWS_ACCOUNT_ID="533267099239"
-        AWS_DEFAULT_REGION="us-east-1"
+        AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()
+        AWS_DEFAULT_REGION = sh(script: 'aws configure get region', returnStdout: true).trim()
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
-        IMAGE_REPO_NAME="test_eks"
-        IMAGE_TAG="v1"
+        IMAGE_REPO_NAME = "test_eks"
+        IMAGE_TAG = "v1"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
     
     stages {
+        stage('Create ECR Repository') {
+            steps {
+                script {
+                    sh "aws ecr create-repository --repository-name ${IMAGE_REPO_NAME} --region ${AWS_DEFAULT_REGION}"
+                }
+            }
+        }
+        
         stage('Cloning Git') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/pkedia009/eks_test.git']]])     
@@ -21,12 +29,11 @@ pipeline {
         stage('Logging into AWS ECR') {
             steps {
                 script {
-                     // Get the AWS credentials from Jenkins credentials
                     // Get the AWS credentials from Jenkins credentials
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
-                // Use the AWS CLI to retrieve an authentication token to use for Docker login
-                def ecrLoginCmd = "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-                sh ecrLoginCmd
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
+                        // Use the AWS CLI to retrieve an authentication token to use for Docker login
+                        def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+                        sh ecrLoginCmd
                     }
                 }
             }

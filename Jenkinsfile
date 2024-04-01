@@ -18,7 +18,7 @@ pipeline {
         
         stage('Building Docker image') {
             steps {
-                echo '=== Building Docker Image ==='
+                
                 script {
                     // Build the Docker image using the specified Dockerfile path
                     def dockerImage = docker.build("-f ${DOCKERFILE_PATH} .")

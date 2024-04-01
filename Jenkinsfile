@@ -20,8 +20,8 @@ pipeline {
     
     environment {
         // Define AWS credentials and region
-        AWS_ACCOUNT_ID = env.AWS_ACCOUNT_ID
-        AWS_DEFAULT_REGION = env.AWS_DEFAULT_REGION
+       AWS_ACCOUNT_ID = "${env.AWS_ACCOUNT_ID}"
+    AWS_DEFAULT_REGION = "${env.AWS_DEFAULT_REGION}"
        
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'

@@ -17,9 +17,7 @@ pipeline {
             }
         }
         stage('Building Docker image') {
-            when {
-                branch 'develop'
-            }
+           
             steps {
                 echo '=== Building Docker Image ==='
                 script {

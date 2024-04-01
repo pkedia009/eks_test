@@ -2,10 +2,14 @@ pipeline {
     agent any
     
     environment {
+        AWS_ACCOUNT_ID="533267099239"
+        AWS_DEFAULT_REGION="us-east-1"
         // Define the path to your Dockerfile
         DOCKERFILE_PATH = '/var/lib/jenkins/workspace/eks'
-        // Define the AWS ECR repository URL
-        AWS_ECR_REPO_URL = '533267099239.dkr.ecr.us-east-1.amazonaws.com/test_eks'
+        IMAGE_REPO_NAME="test_eks"
+        IMAGE_TAG="v1"
+        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+    
     }
     
     stages {
@@ -14,7 +18,22 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/pkedia009/eks_test.git']]])     
             }
         }
-        
+         stage('Logging into AWS ECR') {
+            steps {
+                script {
+                sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+                }
+                 
+            }
+        }
+
+        stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build "${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+        }
+      }
+    }
         stage('Building Docker image') {
             steps {
                 script {
@@ -26,26 +45,14 @@ pipeline {
             }
         }
         
-        stage('Pushing to ECR') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                echo '=== Pushing Docker Image ==='
-                script {
-                    // Get the Git commit hash
-                    def GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true).trim()
-                    def SHORT_COMMIT = GIT_COMMIT_HASH.take(7)
-                    withCredentials([aws(credentials: 'aws_cred', region: 'us-east-1')]) {
-                sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ECR_REPO_URL"
-                
-                // Push the Docker image to AWS ECR
-                docker.withRegistry("${AWS_ECR_REPO_URL}", 'ecr:us-east-1') {
-                    dockerImage.push("${AWS_ECR_REPO_URL}:${BUILD_NUMBER}")
-                }
-                }
-            }
-        }}
+       stage('Pushing to ECR') {
+     steps{  
+         script {
+                sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"
+                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+         }
+        }
+      }
         
         stage ('Helm Deploy') {
             steps {

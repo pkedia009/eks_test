@@ -15,7 +15,9 @@ pipeline {
         stage('Create ECR Repository') {
             steps {
                 script {
+                       withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]){
                     sh "aws ecr create-repository --repository-name ${IMAGE_REPO_NAME} --region ${AWS_DEFAULT_REGION}"
+                       }
                 }
             }
         }
